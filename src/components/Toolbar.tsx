@@ -15,17 +15,56 @@ import {
   Plus,
   Minus,
   Menu,
+  Image as ImageIcon,
 } from 'lucide-react';
+import { useRef } from 'react';
 
 interface ToolbarProps {
   editor: Editor | null;
   onToggleSidebar: () => void;
 }
 
+const FONT_FAMILIES = [
+  { name: 'Default', value: '' },
+  { name: 'Inter', value: 'Inter, sans-serif' },
+  { name: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+  { name: 'Courier New', value: '"Courier New", Courier, monospace' },
+  { name: 'Georgia', value: 'Georgia, serif' },
+  { name: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+];
+
+const FONT_SIZES = [
+  { name: 'Default', value: '' },
+  { name: '12px', value: '12px' },
+  { name: '14px', value: '14px' },
+  { name: '16px', value: '16px' },
+  { name: '18px', value: '18px' },
+  { name: '20px', value: '20px' },
+  { name: '24px', value: '24px' },
+  { name: '30px', value: '30px' },
+];
+
 export const Toolbar = ({ editor, onToggleSidebar }: ToolbarProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   if (!editor) {
     return null;
   }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        editor.chain().focus().setImage({ src: base64 }).run();
+      };
+      reader.readAsDataURL(file);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <div className="flex items-center gap-1 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pb-2 bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-b border-gray-200 dark:border-gray-700 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] md:shadow-sm transition-colors overflow-x-auto whitespace-nowrap">
@@ -37,6 +76,47 @@ export const Toolbar = ({ editor, onToggleSidebar }: ToolbarProps) => {
         <Menu size={18} />
       </button>
       <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 transition-colors md:hidden flex-shrink-0" />
+      
+      <select
+        onChange={(e) => {
+          if (e.target.value) {
+            editor.chain().focus().setFontFamily(e.target.value).run();
+          } else {
+            editor.chain().focus().unsetFontFamily().run();
+          }
+        }}
+        value={editor.getAttributes('textStyle').fontFamily || ''}
+        className="p-1.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 flex-shrink-0"
+        title="Font Family"
+      >
+        {FONT_FAMILIES.map((font) => (
+          <option key={font.name} value={font.value}>
+            {font.name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        onChange={(e) => {
+          if (e.target.value) {
+            editor.chain().focus().setFontSize(e.target.value).run();
+          } else {
+            editor.chain().focus().unsetFontSize().run();
+          }
+        }}
+        value={editor.getAttributes('textStyle').fontSize || ''}
+        className="p-1.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 flex-shrink-0 w-20"
+        title="Font Size"
+      >
+        {FONT_SIZES.map((size) => (
+          <option key={size.name} value={size.value}>
+            {size.name}
+          </option>
+        ))}
+      </select>
+
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 transition-colors flex-shrink-0" />
+
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -151,6 +231,21 @@ export const Toolbar = ({ editor, onToggleSidebar }: ToolbarProps) => {
           </button>
         </>
       )}
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 transition-colors flex-shrink-0" />
+      <button
+        onClick={() => fileInputRef.current?.click()}
+        className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors flex-shrink-0"
+        title="Insert Image"
+      >
+        <ImageIcon size={18} />
+      </button>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        className="hidden"
+      />
       <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 transition-colors flex-shrink-0" />
       <button
         onClick={() => editor.chain().focus().undo().run()}
