@@ -1,0 +1,21 @@
+{
+  "name": "Polza Docs Editor",
+  "short_name": "Polza Docs",
+  "description": "A smart text editor powered by Polza.ai",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/polza192/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/seed/polza512/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
