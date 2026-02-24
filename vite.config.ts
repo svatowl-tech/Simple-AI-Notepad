@@ -15,6 +15,26 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            tiptap: [
+              '@tiptap/react',
+              '@tiptap/starter-kit',
+              '@tiptap/extension-table',
+              '@tiptap/extension-table-row',
+              '@tiptap/extension-table-cell',
+              '@tiptap/extension-table-header'
+            ],
+            lucide: ['lucide-react'],
+            mammoth: ['mammoth'],
+            docx: ['docx']
+          }
+        }
+      }
+    },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
